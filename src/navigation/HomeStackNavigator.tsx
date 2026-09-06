@@ -10,6 +10,7 @@ import SlotSelectionCalendarScreen from '../screens/home/SlotSelectionCalendarSc
 import SlotSelectionTimeGridScreen from '../screens/home/SlotSelectionTimeGridScreen';
 import BookingSummaryScreen from '../screens/booking/BookingSummaryScreen';
 import BookingConfirmationScreen from '../screens/booking/BookingConfirmationScreen';
+import { getDoctorById } from '../data/mockData';
 import { colors } from '../theme/tokens';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -35,6 +36,7 @@ function SlotSelectionTimeGridRoute({
   navigation,
   route,
 }: NativeStackScreenProps<HomeStackParamList, 'SlotSelectionTimeGrid'>) {
+  const doctor = getDoctorById(route.params.doctorId);
   return (
     <SlotSelectionTimeGridScreen
       doctorId={route.params.doctorId}
@@ -42,6 +44,9 @@ function SlotSelectionTimeGridRoute({
       onBack={navigation.goBack}
       onContinue={(time) =>
         navigation.navigate('BookingSummary', { doctorId: route.params.doctorId, date: route.params.date, time })
+      }
+      onChooseDifferentDoctor={
+        doctor ? () => navigation.navigate('HospitalProfile', { hospitalId: doctor.hospitalId }) : undefined
       }
     />
   );

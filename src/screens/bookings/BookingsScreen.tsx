@@ -38,8 +38,8 @@ async function toRows(bookings: Booking[]): Promise<Row[]> {
   );
 }
 
-export default function BookingsScreen({ navigation }: Props) {
-  const [tab, setTab] = useState<Tab>('Upcoming');
+export default function BookingsScreen({ navigation, route }: Props) {
+  const [tab, setTab] = useState<Tab>(route.params?.initialTab ?? 'Upcoming');
   const [upcomingRows, setUpcomingRows] = useState<Row[] | null>(null);
   const [pastRows, setPastRows] = useState<Row[] | null>(null);
 

@@ -37,12 +37,19 @@ export type HomeStackParamList = {
 };
 
 export type BookingsStackParamList = {
-  BookingsList: undefined;
+  BookingsList: { initialTab?: 'Upcoming' | 'Past' } | undefined;
   AppointmentDetail: { bookingId: string };
   RescheduleCalendar: { bookingId: string; doctorId: string };
   RescheduleTimeGrid: { bookingId: string; doctorId: string; date: string };
   RescheduleConfirm: { bookingId: string; doctorId: string; date: string; time: string };
   CancelConfirmation: { bookingId: string };
+  RescheduleRequired: {
+    bookingId: string;
+    scenario: 'DELAYED_TODAY' | 'UNAVAILABLE';
+    forceExhausted?: boolean;
+  };
+  RescheduleRequiredConfirmed: { bookingId: string; date: string; time: string };
+  Waitlist: { bookingId: string; doctorId: string };
 };
 
 export type ProfileStackParamList = {

@@ -6,6 +6,9 @@ import BookingsScreen from '../screens/bookings/BookingsScreen';
 import AppointmentDetailScreen from '../screens/bookings/AppointmentDetailScreen';
 import RescheduleConfirmScreen from '../screens/bookings/RescheduleConfirmScreen';
 import CancelConfirmationScreen from '../screens/bookings/CancelConfirmationScreen';
+import RescheduleRequiredScreen from '../screens/bookings/RescheduleRequiredScreen';
+import RescheduleRequiredConfirmedScreen from '../screens/bookings/RescheduleRequiredConfirmedScreen';
+import WaitlistScreen from '../screens/bookings/WaitlistScreen';
 import SlotSelectionCalendarScreen from '../screens/home/SlotSelectionCalendarScreen';
 import SlotSelectionTimeGridScreen from '../screens/home/SlotSelectionTimeGridScreen';
 import { colors } from '../theme/tokens';
@@ -70,6 +73,9 @@ export default function BookingsStackNavigator() {
       <Stack.Screen name="RescheduleTimeGrid" component={RescheduleTimeGridRoute} />
       <Stack.Screen name="RescheduleConfirm" component={RescheduleConfirmScreen} />
       <Stack.Screen name="CancelConfirmation" component={CancelConfirmationScreen} />
+      <Stack.Screen name="RescheduleRequired" component={RescheduleRequiredScreen} />
+      <Stack.Screen name="RescheduleRequiredConfirmed" component={RescheduleRequiredConfirmedScreen} />
+      <Stack.Screen name="Waitlist" component={WaitlistScreen} />
     </Stack.Navigator>
   );
 }

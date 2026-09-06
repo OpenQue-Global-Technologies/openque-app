@@ -9,7 +9,7 @@ import PillTextInput from '../../components/PillTextInput';
 import Dropdown from '../../components/Dropdown';
 import SearchResultCard from '../../components/SearchResultCard';
 import PrimaryButton from '../../components/PrimaryButton';
-import { Body, Heading } from '../../components/Typography';
+import { Body, Caption, Heading } from '../../components/Typography';
 import FiltersPanel, { DEFAULT_FILTERS, type SearchFilters } from '../../components/FiltersPanel';
 import { HOSPITALS, getHospitalSearchMeta, type HospitalSearchMeta, type Hospital } from '../../data/mockData';
 import { colors, spacing, touchTarget } from '../../theme/tokens';
@@ -30,6 +30,7 @@ export default function SearchResultsScreen({ navigation, route }: Props) {
   const [sortBy, setSortBy] = useState<SortOption>('Distance');
   const [isFiltersVisible, setFiltersVisible] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
 
   const results = useMemo<ResultRow[]>(() => {
     const specialtyFilter = filters.specialties[0];
@@ -114,9 +115,52 @@ export default function SearchResultsScreen({ navigation, route }: Props) {
       </View>
 
       {viewMode === 'map' ? (
-        <View style={styles.mapPlaceholder}>
-          <Ionicons name="map-outline" size={48} color={colors.neutralMuted} />
-          <Body style={styles.mapPlaceholderText}>Map view coming soon</Body>
+        <View style={styles.mapContainer}>
+          <View style={styles.mapCanvas}>
+            <Caption style={styles.mapDisclaimer}>
+              Illustrative placeholder — pins are positioned schematically, not on live map data.
+            </Caption>
+            {results.map((row, index) => {
+              // Deterministic pseudo-scatter so pins don't overlap — closer
+              // hospitals sit nearer the center, matching their distance rank.
+              const angle = (index / Math.max(results.length, 1)) * 2 * Math.PI;
+              const radiusFraction = 0.25 + (index % 3) * 0.2;
+              const left = 50 + Math.cos(angle) * radiusFraction * 42;
+              const top = 50 + Math.sin(angle) * radiusFraction * 42;
+              const isSelected = row.hospital.id === selectedPinId;
+              return (
+                <Pressable
+                  key={row.hospital.id}
+                  onPress={() => setSelectedPinId(row.hospital.id)}
+                  style={[styles.mapPin, { left: `${left}%`, top: `${top}%` }]}
+                >
+                  <Ionicons
+                    name="location"
+                    size={isSelected ? 36 : 28}
+                    color={isSelected ? colors.secondary : colors.primary}
+                  />
+                </Pressable>
+              );
+            })}
+          </View>
+
+          {selectedPinId &&
+            (() => {
+              const selectedRow = results.find((row) => row.hospital.id === selectedPinId);
+              if (!selectedRow) return null;
+              return (
+                <SearchResultCard
+                  hospital={selectedRow.hospital}
+                  meta={selectedRow.meta}
+                  onPress={() => navigation.navigate('HospitalProfile', { hospitalId: selectedRow.hospital.id })}
+                />
+              );
+            })()}
+
+          <Pressable onPress={() => setViewMode('list')} style={styles.mapToListLink}>
+            <Ionicons name="list-outline" size={16} color={colors.primary} />
+            <Body style={styles.mapToListText}>View as list</Body>
+          </Pressable>
         </View>
       ) : results.length === 0 ? (
         <View style={styles.emptyState}>
@@ -220,13 +264,39 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
-  mapPlaceholder: {
+  mapContainer: {
     flex: 1,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.lg,
+    gap: spacing.md,
+  },
+  mapCanvas: {
+    flex: 1,
+    borderRadius: 16,
+    backgroundColor: colors.accent,
+    overflow: 'hidden',
+  },
+  mapDisclaimer: {
+    position: 'absolute',
+    top: spacing.sm,
+    left: spacing.sm,
+    right: spacing.sm,
+    color: colors.neutralMuted,
+    textAlign: 'center',
+  },
+  mapPin: {
+    position: 'absolute',
+    transform: [{ translateX: -14 }, { translateY: -28 }],
+  },
+  mapToListLink: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
+    minHeight: touchTarget.minimum,
   },
-  mapPlaceholderText: {
-    color: colors.neutralMuted,
+  mapToListText: {
+    color: colors.primary,
+    fontWeight: '600',
   },
 });

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { HomeStackParamList } from '../../navigation/types';
 import ScreenContainer from '../../components/ScreenContainer';
 import BackButton from '../../components/BackButton';
 import Card from '../../components/Card';
 import PrimaryButton from '../../components/PrimaryButton';
+import DevPanel from '../../components/DevPanel';
 import { Body, Caption, Heading } from '../../components/Typography';
 import { getDoctorById, getHospitalById } from '../../data/mockData';
 import { colors, spacing } from '../../theme/tokens';
@@ -18,6 +20,8 @@ export default function BookingSummaryScreen({ navigation, route }: Props) {
   const doctor = getDoctorById(doctorId);
   const hospital = doctor ? getHospitalById(doctor.hospitalId) : undefined;
   const [isConfirming, setIsConfirming] = useState(false);
+  const [devSimulateRace, setDevSimulateRace] = useState(false);
+  const [slotTaken, setSlotTaken] = useState(false);
 
   if (!doctor || !hospital) {
     return (
@@ -34,6 +38,10 @@ export default function BookingSummaryScreen({ navigation, route }: Props) {
   });
 
   const handleConfirm = async () => {
+    if (devSimulateRace) {
+      setSlotTaken(true);
+      return;
+    }
     setIsConfirming(true);
     const booking = await addBooking({
       doctorId,
@@ -45,6 +53,22 @@ export default function BookingSummaryScreen({ navigation, route }: Props) {
     setIsConfirming(false);
     navigation.replace('BookingConfirmation', { bookingId: booking.id });
   };
+
+  const handleChooseAnotherSlot = () => {
+    navigation.navigate('SlotSelectionTimeGrid', { doctorId, date });
+  };
+
+  if (slotTaken) {
+    return (
+      <ScreenContainer centered>
+        <Ionicons name="alert-circle-outline" size={48} color={colors.neutralMuted} />
+        <Heading style={styles.raceHeading}>This slot was just booked by someone else.</Heading>
+        <View style={styles.raceAction}>
+          <PrimaryButton label="Choose another slot" onPress={handleChooseAnotherSlot} />
+        </View>
+      </ScreenContainer>
+    );
+  }
 
   return (
     <ScreenContainer>
@@ -73,6 +97,18 @@ export default function BookingSummaryScreen({ navigation, route }: Props) {
       <View style={styles.footer}>
         <PrimaryButton label="Confirm Booking" onPress={handleConfirm} loading={isConfirming} />
       </View>
+
+      <DevPanel
+        title="booking-race simulation"
+        actions={[
+          {
+            label: devSimulateRace
+              ? 'Armed: next confirm will hit the race'
+              : 'Simulate: someone else books this slot',
+            onPress: () => setDevSimulateRace((current) => !current),
+          },
+        ]}
+      />
     </ScreenContainer>
   );
 }
@@ -103,5 +139,14 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: 'auto',
     paddingBottom: spacing.xl,
+  },
+  raceHeading: {
+    textAlign: 'center',
+    fontSize: 20,
+    marginTop: spacing.md,
+  },
+  raceAction: {
+    width: '100%',
+    marginTop: spacing.xxl,
   },
 });

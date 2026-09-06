@@ -6,35 +6,65 @@ import type { QueueState } from '../state/queueStore';
 import { colors, spacing } from '../theme/tokens';
 
 type StageStatus = 'done' | 'active' | 'upcoming';
+type StageKey = 'arrived' | 'consultation' | 'testscan' | 'consultation2' | 'completed';
 
-const STAGES: { key: string; label: string }[] = [
-  { key: 'arrived', label: 'Arrived' },
-  { key: 'consultation', label: 'Consultation' },
-  { key: 'completed', label: 'Completed' },
-];
+type Stage = { key: StageKey; label: string };
 
-function getStageStatus(stageKey: string, state: QueueState): StageStatus {
-  if (stageKey === 'arrived') {
-    return state === 'BOOKED' ? 'upcoming' : 'done';
+/**
+ * Section 6.2: "Dynamic progress bar — stages appear only once generated:
+ * Arrived → Consultation → [Test/Scan if referred] → Consultation →
+ * Completed." The Test/Scan + second Consultation nodes only render once
+ * `wasReferred` is true for this booking.
+ */
+function buildStages(wasReferred: boolean): Stage[] {
+  const stages: Stage[] = [
+    { key: 'arrived', label: 'Arrived' },
+    { key: 'consultation', label: 'Consultation' },
+  ];
+  if (wasReferred) {
+    stages.push({ key: 'testscan', label: 'Test/Scan' });
+    stages.push({ key: 'consultation2', label: 'Consultation' });
   }
-  if (stageKey === 'consultation') {
-    if (state === 'CALLED' || state === 'IN_CONSULTATION') return 'active';
-    if (state === 'COMPLETED') return 'done';
-    return 'upcoming';
+  stages.push({ key: 'completed', label: 'Completed' });
+  return stages;
+}
+
+function getStageStatus(key: StageKey, state: QueueState, wasReferred: boolean): StageStatus {
+  switch (key) {
+    case 'arrived':
+      return state === 'BOOKED' ? 'upcoming' : 'done';
+    case 'consultation':
+      // Once referred, the first consultation is necessarily already behind
+      // us — referral only happens FROM IN_CONSULTATION (Section 9.1).
+      if (wasReferred) return 'done';
+      if (state === 'CALLED' || state === 'IN_CONSULTATION') return 'active';
+      if (state === 'COMPLETED') return 'done';
+      return 'upcoming';
+    case 'testscan':
+      return state === 'REFERRED' ? 'active' : 'done';
+    case 'consultation2':
+      if (state === 'CALLED' || state === 'IN_CONSULTATION') return 'active';
+      if (state === 'COMPLETED') return 'done';
+      return 'upcoming'; // REFERRED or RETURNING — not back in consultation yet
+    case 'completed':
+      return state === 'COMPLETED' ? 'done' : 'upcoming';
+    default:
+      return 'upcoming';
   }
-  // completed
-  return state === 'COMPLETED' ? 'done' : 'upcoming';
 }
 
 type Props = {
   state: QueueState;
+  wasReferred: boolean;
 };
 
-export default function QueueProgressBar({ state }: Props) {
+export default function QueueProgressBar({ state, wasReferred }: Props) {
+  const stages = buildStages(wasReferred);
+
   return (
     <View style={styles.row}>
-      {STAGES.map((stage, index) => {
-        const status = getStageStatus(stage.key, state);
+      {stages.map((stage, index) => {
+        const status = getStageStatus(stage.key, state, wasReferred);
         return (
           <React.Fragment key={stage.key}>
             <View style={styles.stage}>
@@ -55,11 +85,12 @@ export default function QueueProgressBar({ state }: Props) {
                 {stage.label}
               </Caption>
             </View>
-            {index < STAGES.length - 1 && (
+            {index < stages.length - 1 && (
               <View
                 style={[
                   styles.connector,
-                  getStageStatus(STAGES[index + 1].key, state) !== 'upcoming' && styles.connectorDone,
+                  getStageStatus(stages[index + 1].key, state, wasReferred) !== 'upcoming' &&
+                    styles.connectorDone,
                 ]}
               />
             )}
