@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import type { MainTabParamList } from './types';
 import HomeStackNavigator from './HomeStackNavigator';
-import BookingsStubScreen from '../screens/bookings/BookingsStubScreen';
+import BookingsStackNavigator from './BookingsStackNavigator';
 import QueueScreen from '../screens/queue/QueueScreen';
 import ProfileStubScreen from '../screens/profile/ProfileStubScreen';
 import { colors, fonts } from '../theme/tokens';
@@ -32,7 +32,7 @@ export default function MainTabNavigator() {
       })}
     >
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ title: 'Home' }} />
-      <Tab.Screen name="BookingsTab" component={BookingsStubScreen} options={{ title: 'Bookings' }} />
+      <Tab.Screen name="BookingsTab" component={BookingsStackNavigator} options={{ title: 'Bookings' }} />
       <Tab.Screen name="QueueTab" component={QueueScreen} options={{ title: 'Queue' }} />
       <Tab.Screen name="ProfileTab" component={ProfileStubScreen} options={{ title: 'Profile' }} />
     </Tab.Navigator>

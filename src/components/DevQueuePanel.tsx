@@ -9,6 +9,7 @@ type Props = {
   onMarkArrived: () => void;
   onCallPatient: () => void;
   onCompleteVisit: () => void;
+  onMarkNoShow: () => void;
   onReset: () => void;
 };
 
@@ -25,11 +26,19 @@ type DevAction = {
  * for it and should be deleted once that exists. Intentionally styled off
  * the product's design tokens so it reads as scaffolding, not real UI.
  */
-export default function DevQueuePanel({ state, onMarkArrived, onCallPatient, onCompleteVisit, onReset }: Props) {
+export default function DevQueuePanel({
+  state,
+  onMarkArrived,
+  onCallPatient,
+  onCompleteVisit,
+  onMarkNoShow,
+  onReset,
+}: Props) {
   const actions: DevAction[] = [
     { label: 'Mark Arrived → WAITING', enabled: state === 'BOOKED', onPress: onMarkArrived },
     { label: 'Call Patient → CALLED', enabled: state === 'WAITING', onPress: onCallPatient },
     { label: 'Complete Visit → COMPLETED', enabled: state === 'IN_CONSULTATION', onPress: onCompleteVisit },
+    { label: 'Mark No-Show → NO_SHOW', enabled: state === 'WAITING', onPress: onMarkNoShow },
     { label: 'Reset demo → BOOKED', enabled: state !== 'BOOKED', onPress: onReset },
   ];
 

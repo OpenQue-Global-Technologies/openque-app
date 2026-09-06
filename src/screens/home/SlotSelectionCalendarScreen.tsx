@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../navigation/types';
 import ScreenContainer from '../../components/ScreenContainer';
 import BackButton from '../../components/BackButton';
 import PrimaryButton from '../../components/PrimaryButton';
@@ -9,7 +7,17 @@ import { Body, Caption, SubHeading } from '../../components/Typography';
 import { getDoctorById, getHospitalById } from '../../data/mockData';
 import { colors, radius, spacing } from '../../theme/tokens';
 
-type Props = NativeStackScreenProps<HomeStackParamList, 'SlotSelectionCalendar'>;
+/**
+ * Navigator-agnostic — both the Home stack (fresh booking) and the Bookings
+ * stack (patient-initiated reschedule, Section 6.2) render this same
+ * component and supply their own navigation wiring via these callbacks,
+ * rather than each stack shipping its own copy of the slot-picker UI.
+ */
+type Props = {
+  doctorId: string;
+  onBack: () => void;
+  onContinue: (dateKey: string) => void;
+};
 
 const DAYS_AHEAD = 14;
 
@@ -28,8 +36,8 @@ function buildDateOptions() {
   return options;
 }
 
-export default function SlotSelectionCalendarScreen({ navigation, route }: Props) {
-  const doctor = getDoctorById(route.params.doctorId);
+export default function SlotSelectionCalendarScreen({ doctorId, onBack, onContinue }: Props) {
+  const doctor = getDoctorById(doctorId);
   const hospital = doctor ? getHospitalById(doctor.hospitalId) : undefined;
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
   const dateOptions = buildDateOptions();
@@ -44,13 +52,13 @@ export default function SlotSelectionCalendarScreen({ navigation, route }: Props
 
   const handleContinue = () => {
     if (!selectedDateKey) return;
-    navigation.navigate('SlotSelectionTimeGrid', { doctorId: doctor.id, date: selectedDateKey });
+    onContinue(selectedDateKey);
   };
 
   return (
     <ScreenContainer>
       <View style={styles.topRow}>
-        <BackButton onPress={navigation.goBack} />
+        <BackButton onPress={onBack} />
       </View>
 
       <View style={styles.header}>

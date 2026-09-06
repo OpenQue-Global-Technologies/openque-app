@@ -82,6 +82,11 @@ export default function QueueScreen({ navigation }: Props) {
     setShowCompletionPrompt(true);
   };
 
+  const handleMarkNoShow = () => {
+    if (!booking) return;
+    updateState(booking.id, 'NO_SHOW');
+  };
+
   const handleReset = () => {
     if (!booking) return;
     updateState(booking.id, 'BOOKED');
@@ -115,6 +120,7 @@ export default function QueueScreen({ navigation }: Props) {
       onMarkArrived={handleMarkArrived}
       onCallPatient={handleCallPatient}
       onCompleteVisit={handleCompleteVisit}
+      onMarkNoShow={handleMarkNoShow}
       onReset={handleReset}
     />
   );
@@ -140,7 +146,7 @@ export default function QueueScreen({ navigation }: Props) {
     );
   }
 
-  if (queueState === 'BOOKED' || queueState === 'COMPLETED') {
+  if (queueState === 'BOOKED' || queueState === 'COMPLETED' || queueState === 'NO_SHOW') {
     return (
       <ScreenContainer>
         <ScrollView contentContainerStyle={styles.scrollContent}>

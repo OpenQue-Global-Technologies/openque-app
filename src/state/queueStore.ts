@@ -7,10 +7,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * booking so a reload during manual testing doesn't lose position.
  *
  * Full path used (not the Solo-mode collapse): BOOKED -> WAITING -> CALLED ->
- * IN_CONSULTATION -> COMPLETED. REFERRED/RETURNING and NO_SHOW are out of
- * scope this phase.
+ * IN_CONSULTATION -> COMPLETED. REFERRED/RETURNING are out of scope this
+ * phase. NO_SHOW (desk-recorded LEFT_WITHOUT_BEING_SEEN, Section 6.2) is
+ * reachable from WAITING via the dev panel — Phase 4 needs it only to render
+ * the Past "No-show" status tag, not a full no-show trigger flow.
  */
-export type QueueState = 'BOOKED' | 'WAITING' | 'CALLED' | 'IN_CONSULTATION' | 'COMPLETED';
+export type QueueState =
+  | 'BOOKED'
+  | 'WAITING'
+  | 'CALLED'
+  | 'IN_CONSULTATION'
+  | 'COMPLETED'
+  | 'NO_SHOW';
 
 const STORAGE_KEY_PREFIX = 'openque.mockQueueState.';
 
@@ -22,7 +30,8 @@ export async function getQueueState(bookingId: string): Promise<QueueState> {
       value === 'WAITING' ||
       value === 'CALLED' ||
       value === 'IN_CONSULTATION' ||
-      value === 'COMPLETED'
+      value === 'COMPLETED' ||
+      value === 'NO_SHOW'
     ) {
       return value;
     }

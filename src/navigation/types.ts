@@ -1,3 +1,4 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { Specialty } from '../data/mockData';
 
 export type AuthEntryPoint = 'carousel' | 'direct';
@@ -18,8 +19,8 @@ export type RootStackParamList = {
 };
 
 export type MainTabParamList = {
-  HomeTab: undefined;
-  BookingsTab: undefined;
+  HomeTab: NavigatorScreenParams<HomeStackParamList> | undefined;
+  BookingsTab: NavigatorScreenParams<BookingsStackParamList> | undefined;
   QueueTab: undefined;
   ProfileTab: undefined;
 };
@@ -33,4 +34,13 @@ export type HomeStackParamList = {
   SlotSelectionTimeGrid: { doctorId: string; date: string };
   BookingSummary: { doctorId: string; date: string; time: string };
   BookingConfirmation: { bookingId: string };
+};
+
+export type BookingsStackParamList = {
+  BookingsList: undefined;
+  AppointmentDetail: { bookingId: string };
+  RescheduleCalendar: { bookingId: string; doctorId: string };
+  RescheduleTimeGrid: { bookingId: string; doctorId: string; date: string };
+  RescheduleConfirm: { bookingId: string; doctorId: string; date: string; time: string };
+  CancelConfirmation: { bookingId: string };
 };

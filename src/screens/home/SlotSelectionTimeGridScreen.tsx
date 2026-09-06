@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { HomeStackParamList } from '../../navigation/types';
 import ScreenContainer from '../../components/ScreenContainer';
 import BackButton from '../../components/BackButton';
 import Chip from '../../components/Chip';
@@ -10,12 +8,20 @@ import { Body, Caption, SubHeading } from '../../components/Typography';
 import { getDoctorById, getHospitalById, getSlotsForDoctorOnDate, type TimeOfDay } from '../../data/mockData';
 import { colors, spacing } from '../../theme/tokens';
 
-type Props = NativeStackScreenProps<HomeStackParamList, 'SlotSelectionTimeGrid'>;
+/**
+ * Navigator-agnostic — see SlotSelectionCalendarScreen's note. Shared by the
+ * Home stack's fresh-booking flow and the Bookings stack's reschedule flow.
+ */
+type Props = {
+  doctorId: string;
+  date: string;
+  onBack: () => void;
+  onContinue: (time: string) => void;
+};
 
 const PERIODS: TimeOfDay[] = ['Morning', 'Afternoon', 'Evening'];
 
-export default function SlotSelectionTimeGridScreen({ navigation, route }: Props) {
-  const { doctorId, date } = route.params;
+export default function SlotSelectionTimeGridScreen({ doctorId, date, onBack, onContinue }: Props) {
   const doctor = getDoctorById(doctorId);
   const hospital = doctor ? getHospitalById(doctor.hospitalId) : undefined;
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -37,13 +43,13 @@ export default function SlotSelectionTimeGridScreen({ navigation, route }: Props
 
   const handleContinue = () => {
     if (!selectedTime) return;
-    navigation.navigate('BookingSummary', { doctorId, date, time: selectedTime });
+    onContinue(selectedTime);
   };
 
   return (
     <ScreenContainer>
       <View style={styles.topRow}>
-        <BackButton onPress={navigation.goBack} />
+        <BackButton onPress={onBack} />
       </View>
 
       <View style={styles.header}>
