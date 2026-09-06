@@ -12,7 +12,7 @@ import EnterLocationManuallyScreen from '../screens/onboarding/EnterLocationManu
 import NotificationAccessScreen from '../screens/onboarding/NotificationAccessScreen';
 import NotificationPreviouslyDeniedScreen from '../screens/onboarding/NotificationPreviouslyDeniedScreen';
 import ProfileDetailsScreen from '../screens/onboarding/ProfileDetailsScreen';
-import HomeScreen from '../screens/home/HomeScreen';
+import MainTabNavigator from './MainTabNavigator';
 import { colors } from '../theme/tokens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -41,7 +41,7 @@ export default function RootNavigator() {
         component={NotificationPreviouslyDeniedScreen}
       />
       <Stack.Screen name="ProfileDetails" component={ProfileDetailsScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Home" component={MainTabNavigator} />
     </Stack.Navigator>
   );
 }

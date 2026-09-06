@@ -1,26 +1,24 @@
-import React, { ReactNode } from 'react';
-import { StyleSheet, Text, TextStyle } from 'react-native';
+import React from 'react';
+import { Text, TextProps as RNTextProps } from 'react-native';
 import { colors, fonts, fontSizes } from '../theme/tokens';
+import { StyleSheet } from 'react-native';
 
-type TextProps = {
-  children: ReactNode;
-  style?: TextStyle;
-};
+type TextProps = RNTextProps;
 
-export function Heading({ children, style }: TextProps) {
-  return <Text style={[styles.heading, style]}>{children}</Text>;
+export function Heading({ style, ...props }: TextProps) {
+  return <Text style={[styles.heading, style]} {...props} />;
 }
 
-export function SubHeading({ children, style }: TextProps) {
-  return <Text style={[styles.subHeading, style]}>{children}</Text>;
+export function SubHeading({ style, ...props }: TextProps) {
+  return <Text style={[styles.subHeading, style]} {...props} />;
 }
 
-export function Body({ children, style }: TextProps) {
-  return <Text style={[styles.body, style]}>{children}</Text>;
+export function Body({ style, ...props }: TextProps) {
+  return <Text style={[styles.body, style]} {...props} />;
 }
 
-export function Caption({ children, style }: TextProps) {
-  return <Text style={[styles.caption, style]}>{children}</Text>;
+export function Caption({ style, ...props }: TextProps) {
+  return <Text style={[styles.caption, style]} {...props} />;
 }
 
 const styles = StyleSheet.create({
