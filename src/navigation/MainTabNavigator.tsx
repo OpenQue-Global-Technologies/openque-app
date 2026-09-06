@@ -5,7 +5,8 @@ import type { MainTabParamList } from './types';
 import HomeStackNavigator from './HomeStackNavigator';
 import BookingsStackNavigator from './BookingsStackNavigator';
 import QueueScreen from '../screens/queue/QueueScreen';
-import ProfileStubScreen from '../screens/profile/ProfileStubScreen';
+import ProfileStackNavigator from './ProfileStackNavigator';
+import { useLanguage } from '../i18n/LanguageContext';
 import { colors, fonts } from '../theme/tokens';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -18,6 +19,8 @@ const TAB_ICONS: Record<keyof MainTabParamList, keyof typeof Ionicons.glyphMap> 
 };
 
 export default function MainTabNavigator() {
+  const { t } = useLanguage();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -31,10 +34,18 @@ export default function MainTabNavigator() {
         ),
       })}
     >
-      <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ title: 'Home' }} />
-      <Tab.Screen name="BookingsTab" component={BookingsStackNavigator} options={{ title: 'Bookings' }} />
-      <Tab.Screen name="QueueTab" component={QueueScreen} options={{ title: 'Queue' }} />
-      <Tab.Screen name="ProfileTab" component={ProfileStubScreen} options={{ title: 'Profile' }} />
+      <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ title: t('tabHome') }} />
+      <Tab.Screen
+        name="BookingsTab"
+        component={BookingsStackNavigator}
+        options={{ title: t('tabBookings') }}
+      />
+      <Tab.Screen name="QueueTab" component={QueueScreen} options={{ title: t('tabQueue') }} />
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileStackNavigator}
+        options={{ title: t('tabProfile') }}
+      />
     </Tab.Navigator>
   );
 }

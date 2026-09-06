@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import PillTextInput from './PillTextInput';
@@ -31,6 +31,18 @@ function parseDateInput(text: string): Date | null {
 export default function DateOfBirthField({ value, onChange, onBlur }: Props) {
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [text, setText] = useState(value ? formatDate(value) : '');
+
+  // `value` can arrive after mount (e.g. a screen that loads the profile
+  // asynchronously) — sync the display text in that case. Guarded on `!text`
+  // so this never clobbers an in-progress edit: while typing, `value` only
+  // goes from null to non-null once `text` already equals the same
+  // formatted string, so this condition is already false by then.
+  useEffect(() => {
+    if (value && !text) {
+      setText(formatDate(value));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   if (Platform.OS === 'web') {
     return (

@@ -11,6 +11,7 @@ import SegmentedControl from '../../components/SegmentedControl';
 import PrimaryButton from '../../components/PrimaryButton';
 import { colors, spacing } from '../../theme/tokens';
 import { setHasExistingSession } from '../../state/session';
+import { dateToLocalIsoString, updateUserProfile } from '../../state/userProfileStore';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProfileDetails'>;
 
@@ -42,6 +43,12 @@ export default function ProfileDetailsScreen({ navigation }: Props) {
   );
 
   const handleContinue = async () => {
+    await updateUserProfile({
+      firstName,
+      lastName,
+      dateOfBirth: dateOfBirth ? dateToLocalIsoString(dateOfBirth) : null,
+      gender,
+    });
     await setHasExistingSession(true);
     navigation.replace('Home');
   };

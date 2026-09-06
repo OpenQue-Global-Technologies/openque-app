@@ -22,7 +22,7 @@ export type MainTabParamList = {
   HomeTab: NavigatorScreenParams<HomeStackParamList> | undefined;
   BookingsTab: NavigatorScreenParams<BookingsStackParamList> | undefined;
   QueueTab: undefined;
-  ProfileTab: undefined;
+  ProfileTab: NavigatorScreenParams<ProfileStackParamList> | undefined;
 };
 
 export type HomeStackParamList = {
@@ -43,4 +43,20 @@ export type BookingsStackParamList = {
   RescheduleTimeGrid: { bookingId: string; doctorId: string; date: string };
   RescheduleConfirm: { bookingId: string; doctorId: string; date: string; time: string };
   CancelConfirmation: { bookingId: string };
+};
+
+export type ProfileStackParamList = {
+  ProfileMain: undefined;
+  EditProfile: undefined;
+  ChangePhoneNumber: undefined;
+  ChangePhoneOtp: { newPhoneNumber: string };
+  NotificationPreferences: undefined;
+  LanguageToggle: undefined;
+  HelpFaq: undefined;
+  ContactSupport: undefined;
+  PrivacySettings: undefined;
+  GrievanceSubmission: undefined;
+  DeleteAccount: undefined;
+  DeleteAccountOtp: undefined;
+  DeleteAccountConfirmation: undefined;
 };

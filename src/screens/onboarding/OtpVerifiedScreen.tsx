@@ -6,18 +6,20 @@ import type { RootStackParamList } from '../../navigation/types';
 import ScreenContainer from '../../components/ScreenContainer';
 import { Heading } from '../../components/Typography';
 import { colors, spacing } from '../../theme/tokens';
+import { updateUserProfile } from '../../state/userProfileStore';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OtpVerified'>;
 
 const AUTO_ADVANCE_MS = 1500;
 
-export default function OtpVerifiedScreen({ navigation }: Props) {
+export default function OtpVerifiedScreen({ navigation, route }: Props) {
   useEffect(() => {
+    updateUserProfile({ phoneNumber: route.params.phoneNumber });
     const timer = setTimeout(() => {
       navigation.replace('LocationAccess');
     }, AUTO_ADVANCE_MS);
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [navigation, route.params.phoneNumber]);
 
   return (
     <ScreenContainer centered>

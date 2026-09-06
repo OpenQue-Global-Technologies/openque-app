@@ -123,6 +123,11 @@ export async function getAllBookings(): Promise<Booking[]> {
   return loadBookings();
 }
 
+/** Called after Delete Account wipes storage, so a fresh signup this same session re-reads defaults. */
+export function resetBookingsCache(): void {
+  cachedBookings = null;
+}
+
 /**
  * Module C (9.4) — Cancellation Handling, simplified for cash-only Scale 1:
  * releasing the slot has no payment/refund side effect, so it reduces to

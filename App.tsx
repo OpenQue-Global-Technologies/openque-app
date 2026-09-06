@@ -15,6 +15,8 @@ import {
   Inter_700Bold,
 } from '@expo-google-fonts/inter';
 import RootNavigator from './src/navigation/RootNavigator';
+import { navigationRef } from './src/navigation/navigationRef';
+import { LanguageProvider } from './src/i18n/LanguageContext';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -48,9 +50,11 @@ export default function App() {
 
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
-      <NavigationContainer>
-        <RootNavigator />
-      </NavigationContainer>
+      <LanguageProvider>
+        <NavigationContainer ref={navigationRef}>
+          <RootNavigator />
+        </NavigationContainer>
+      </LanguageProvider>
       <StatusBar style="dark" />
     </SafeAreaProvider>
   );
