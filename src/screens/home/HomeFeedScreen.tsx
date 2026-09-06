@@ -7,14 +7,23 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import type { HomeStackParamList, MainTabParamList } from '../../navigation/types';
 import ScreenContainer from '../../components/ScreenContainer';
-import { Body, Caption, Heading, SubHeading } from '../../components/Typography';
+import { Body, Caption, SubHeading } from '../../components/Typography';
 import PillTextInput from '../../components/PillTextInput';
 import Chip from '../../components/Chip';
 import HospitalCard from '../../components/HospitalCard';
 import Card from '../../components/Card';
+import QueuePositionCard from '../../components/QueuePositionCard';
 import { HOSPITALS, SPECIALTIES, getDoctorById, getHospitalById } from '../../data/mockData';
 import { colors, spacing } from '../../theme/tokens';
 import { getUpcomingBooking, type Booking } from '../../state/bookingsStore';
+import {
+  AHEAD_COUNT_DEMO,
+  getPatientFacingStatus,
+  getQueueState,
+  type QueueState,
+} from '../../state/queueStore';
+
+const ACTIVE_QUEUE_STATES: QueueState[] = ['WAITING', 'CALLED', 'IN_CONSULTATION'];
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<HomeStackParamList, 'HomeFeed'>,
@@ -23,18 +32,26 @@ type Props = CompositeScreenProps<
 
 export default function HomeFeedScreen({ navigation }: Props) {
   const [upcomingBooking, setUpcomingBooking] = useState<Booking | null>(null);
+  const [queueState, setQueueStateLocal] = useState<QueueState>('BOOKED');
 
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-      getUpcomingBooking().then((booking) => {
-        if (isActive) setUpcomingBooking(booking);
+      getUpcomingBooking().then(async (booking) => {
+        if (!isActive) return;
+        setUpcomingBooking(booking);
+        if (booking) {
+          const state = await getQueueState(booking.id);
+          if (isActive) setQueueStateLocal(state);
+        }
       });
       return () => {
         isActive = false;
       };
     }, []),
   );
+
+  const isQueueActive = ACTIVE_QUEUE_STATES.includes(queueState);
 
   const goToSearch = () => navigation.navigate('SearchResults', undefined);
 
@@ -86,16 +103,24 @@ export default function HomeFeedScreen({ navigation }: Props) {
         {upcomingBooking && upcomingDoctor && upcomingHospital && (
           <View style={styles.section}>
             <SubHeading>Your Upcoming Appointment</SubHeading>
-            <Card
-              onPress={() => navigation.navigate('BookingsTab')}
-              style={styles.appointmentCard}
-            >
-              <Body>{upcomingDoctor.name}</Body>
-              <Caption>{upcomingHospital.name}</Caption>
-              <Caption style={styles.appointmentTime}>
-                {upcomingBooking.date} · {upcomingBooking.time}
-              </Caption>
-            </Card>
+            {isQueueActive ? (
+              <QueuePositionCard
+                doctorName={upcomingDoctor.name}
+                statusText={getPatientFacingStatus(AHEAD_COUNT_DEMO, queueState)}
+                onPress={() => navigation.navigate('QueueTab')}
+              />
+            ) : (
+              <Card
+                onPress={() => navigation.navigate('BookingsTab')}
+                style={styles.appointmentCard}
+              >
+                <Body>{upcomingDoctor.name}</Body>
+                <Caption>{upcomingHospital.name}</Caption>
+                <Caption style={styles.appointmentTime}>
+                  {upcomingBooking.date} · {upcomingBooking.time}
+                </Caption>
+              </Card>
+            )}
           </View>
         )}
 

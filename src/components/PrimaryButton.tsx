@@ -13,9 +13,11 @@ type Props = {
   onPress: (event: GestureResponderEvent) => void;
   disabled?: boolean;
   loading?: boolean;
+  /** White-on-primary variant for use on a Primary/Secondary gradient background. */
+  inverted?: boolean;
 };
 
-export default function PrimaryButton({ label, onPress, disabled, loading }: Props) {
+export default function PrimaryButton({ label, onPress, disabled, loading, inverted }: Props) {
   const isDisabled = disabled || loading;
 
   return (
@@ -27,14 +29,15 @@ export default function PrimaryButton({ label, onPress, disabled, loading }: Pro
       accessibilityState={{ disabled: isDisabled }}
       style={({ pressed }) => [
         styles.button,
+        inverted && styles.buttonInverted,
         isDisabled && styles.buttonDisabled,
-        pressed && !isDisabled && styles.buttonPressed,
+        pressed && !isDisabled && !inverted && styles.buttonPressed,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={colors.white} />
+        <ActivityIndicator color={inverted ? colors.primary : colors.white} />
       ) : (
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, inverted && styles.labelInverted]}>{label}</Text>
       )}
     </Pressable>
   );
@@ -53,6 +56,9 @@ const styles = StyleSheet.create({
   buttonPressed: {
     backgroundColor: colors.secondary,
   },
+  buttonInverted: {
+    backgroundColor: colors.white,
+  },
   buttonDisabled: {
     backgroundColor: colors.neutralMuted,
     opacity: 0.5,
@@ -61,5 +67,8 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontFamily: fonts.bodySemiBold,
     fontSize: fontSizes.bodyLarge,
+  },
+  labelInverted: {
+    color: colors.primary,
   },
 });
